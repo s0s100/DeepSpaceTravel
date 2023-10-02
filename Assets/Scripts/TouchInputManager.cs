@@ -15,8 +15,6 @@ public class TouchInputManager : MonoBehaviour
 
     private void Start()
     {
-        Debug.Log("Touch Input Manager Start");
-
         // Subscribe to touch events using UniRx
         this.UpdateAsObservable()
             .Where(_ => Input.touchCount > 0)
