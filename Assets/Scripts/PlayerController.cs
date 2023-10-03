@@ -1,74 +1,87 @@
 using UnityEngine;
 using UniRx;
 
-public class PlayerController : MonoBehaviour
+namespace Player
 {
-    private Vector2 moveTouchPos = Vector2.zero;
-    private float moveValue = 0.0f;
-    private PlayerData playerData;
-
-    private void Awake()
+    public class PlayerController : MonoBehaviour
     {
-        playerData = GetComponent<PlayerData>();
-    }
+        // Defines how close to the touch player object moves
+        private static float MIN_TOUCH_PLAYER_DISTANCE = 0.1f;
 
-    private void Start()
-    {
-        SubscribeToTouchInputManager();
-        SubscribeToMovement();
-    }
+        private Vector2 moveTouchPos = Vector2.zero;
+        private PlayerData playerData;
 
-    // Called each frame to move player if required
-    private void SubscribeToMovement()
-    {
-        // Periodical movement (should probably refactor)
-        var periodicMovementObservator = Observable
-            .EveryUpdate()
-            .Subscribe(_ =>
+        private void Awake()
+        {
+            playerData = GetComponent<PlayerData>();
+        }
+
+        private void Start()
+        {
+            SubscribeToTouchInputManager();
+            SubscribeToMovement();
+        }
+
+        // Called each frame to move player if required
+        private void SubscribeToMovement()
+        {
+            // Periodical movement (should probably refactor)
+            var periodicMovementObservator = Observable
+                .EveryUpdate()
+                .Subscribe(_ =>
+                {
+                    MovePlayer();
+                });
+        }
+
+        private void SubscribeToTouchInputManager()
+        {
+            var touchInputManager = FindObjectOfType<TouchInputManager>();
+
+            touchInputManager.OnTouchStart.Subscribe(touchPosition =>
             {
-                MovePlayer();
+                moveTouchPos = ProperWorldTouchPos(touchPosition);
             });
-    }
 
-    private void SubscribeToTouchInputManager()
-    {
-        var touchInputManager = FindObjectOfType<TouchInputManager>();
+            touchInputManager.OnTouchMove.Subscribe(touchPosition =>
+            {
+                moveTouchPos = ProperWorldTouchPos(touchPosition);
+            });
 
-        touchInputManager.OnTouchStart.Subscribe(touchPosition =>
+            touchInputManager.OnTouchEnd.Subscribe(touchPosition =>
+            {
+                StopMovement();
+            });
+        }
+
+        private void StopMovement()
         {
-            moveTouchPos = touchPosition;
-            CalculateMoveVector(touchPosition);
-        });
+            moveTouchPos = transform.position;
+        }
 
-        touchInputManager.OnTouchMove.Subscribe(touchPosition =>
+        private Vector2 ProperWorldTouchPos(Vector2 screenTouchPosition)
         {
-            moveTouchPos = touchPosition;
-            CalculateMoveVector(touchPosition);
-        });
+            return Camera.main.ScreenToWorldPoint(screenTouchPosition);
+        }
 
-        touchInputManager.OnTouchEnd.Subscribe(touchPosition =>
+        private float CalculatDirection()
         {
-            StopMovement();
-        });
-    }
+            if (moveTouchPos.x > transform.position.x + MIN_TOUCH_PLAYER_DISTANCE)
+                return 1.0f;
+            else if (moveTouchPos.x < transform.position.x - MIN_TOUCH_PLAYER_DISTANCE)
+                return -1.0f;
+            
+            return 0.0f;
+        }
 
-    private void StopMovement()
-    {
-        moveTouchPos = Vector2.zero;
-        moveValue = 0.0f;
-    }
+        private void MovePlayer()
+        {
+            float moveDirection = CalculatDirection();
 
-    private void CalculateMoveVector(Vector2 touchPosition)
-    {
-        if (touchPosition.x > Screen.width / 2)
-            moveValue = 1.0f;
-        else
-            moveValue = -1.0f;
-    }
-
-    private void MovePlayer()
-    {
-        Vector2 moveVector = moveValue* Time.deltaTime * playerData.Speed * Vector2.right;
-        transform.Translate(moveVector);
+            Vector2 moveVector = moveDirection * Time.deltaTime * playerData.Speed * Vector2.right;
+            transform.Translate(moveVector);
+        }
     }
 }
+
+

@@ -1,32 +1,34 @@
 using UnityEngine;
 
-public class PlayerData : MonoBehaviour
+namespace Player
 {
-    [SerializeField] private int curHealth = 1;
-    [SerializeField] private int maxHealth = 1;
-
-    [SerializeField] private float speed = 1.0f;
-
-    public float Speed => speed;
-    public int CurHealth => curHealth;
-    public int MaxHealth => maxHealth;
-
-    private void Awake()
+    // Class which stores player object data and stores/calculates required data
+    public class PlayerData : MonoBehaviour
     {
-        curHealth = maxHealth;
-    }
+        [SerializeField] private int curHealth = 1;
+        [SerializeField] private int maxHealth = 1;
 
-    public void ReceiveDamage(int damage)
-    {
-        this.curHealth -= damage;
-        if (curHealth <= 0)
+        [SerializeField] private float speed = 1.0f;
+
+        public float Speed => speed;
+        public int CurHealth => curHealth;
+        public int MaxHealth => maxHealth;
+
+        private void Awake()
         {
-            Death();
+            curHealth = maxHealth;
         }
-    }
 
-    private void Death()
-    {
-        Debug.Log("The game is over!");
+        public void ReceiveDamage(int damage)
+        {
+            curHealth -= damage;
+            if (curHealth <= 0)
+                Death();
+        }
+
+        private void Death()
+        {
+            Debug.Log("The game is over!");
+        }
     }
 }
