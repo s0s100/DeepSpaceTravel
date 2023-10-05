@@ -6,14 +6,14 @@ namespace Player
     public class PlayerController : MonoBehaviour
     {
         // Defines how close to the touch player object moves
-        private static float MIN_TOUCH_PLAYER_DISTANCE = 0.1f;
+        [SerializeField] private float minTouchDistance = 0.1f;
 
-        private Vector2 moveTouchPos = Vector2.zero;
-        private PlayerData playerData;
+        private PlayerData m_playerData;
+        private Vector2 m_moveTouchPos = Vector2.zero;
 
         private void Awake()
         {
-            playerData = GetComponent<PlayerData>();
+            m_playerData = GetComponent<PlayerData>();
         }
 
         private void Start()
@@ -22,10 +22,9 @@ namespace Player
             SubscribeToMovement();
         }
 
-        // Called each frame to move player if required
+        // Called each frame to move player
         private void SubscribeToMovement()
         {
-            // Periodical movement (should probably refactor)
             var periodicMovementObservator = Observable
                 .EveryUpdate()
                 .Subscribe(_ =>
@@ -40,12 +39,12 @@ namespace Player
 
             touchInputManager.OnTouchStart.Subscribe(touchPosition =>
             {
-                moveTouchPos = ProperWorldTouchPos(touchPosition);
+                m_moveTouchPos = ScreenInfo.GetWorldTouchPos(touchPosition);
             });
 
             touchInputManager.OnTouchMove.Subscribe(touchPosition =>
             {
-                moveTouchPos = ProperWorldTouchPos(touchPosition);
+                m_moveTouchPos = ScreenInfo.GetWorldTouchPos(touchPosition);
             });
 
             touchInputManager.OnTouchEnd.Subscribe(touchPosition =>
@@ -56,19 +55,14 @@ namespace Player
 
         private void StopMovement()
         {
-            moveTouchPos = transform.position;
-        }
-
-        private Vector2 ProperWorldTouchPos(Vector2 screenTouchPosition)
-        {
-            return Camera.main.ScreenToWorldPoint(screenTouchPosition);
+            m_moveTouchPos = transform.position;
         }
 
         private float CalculatDirection()
         {
-            if (moveTouchPos.x > transform.position.x + MIN_TOUCH_PLAYER_DISTANCE)
+            if (m_moveTouchPos.x > transform.position.x + minTouchDistance)
                 return 1.0f;
-            else if (moveTouchPos.x < transform.position.x - MIN_TOUCH_PLAYER_DISTANCE)
+            else if (m_moveTouchPos.x < transform.position.x - minTouchDistance)
                 return -1.0f;
             
             return 0.0f;
@@ -77,9 +71,26 @@ namespace Player
         private void MovePlayer()
         {
             float moveDirection = CalculatDirection();
+            if (moveDirection == 0.0f)
+                return;
 
-            Vector2 moveVector = moveDirection * Time.deltaTime * playerData.Speed * Vector2.right;
-            transform.Translate(moveVector);
+            float movement = moveDirection * Time.deltaTime * m_playerData.Speed;
+            Vector2 moveVector = new(movement, 0.0f);
+            if (CanMove(moveVector)) 
+                transform.Translate(moveVector);
+        }
+
+        private bool CanMove(Vector2 moveVector)
+        {
+            // Divided by 2 to have a bounary between screen and the right side of the screen equal to 2
+            float playerXBoundary = m_playerData.CalculateXSize() / 2;
+            float maxXScreenPos = ScreenInfo.GetMaxXPos();
+            float minXScreenPos = ScreenInfo.GetMinXPos();
+
+            bool canMoveLeft = (minXScreenPos + playerXBoundary < transform.position.x) || (moveVector.x > 0.0f);
+            bool canMoveRight = (maxXScreenPos - playerXBoundary > transform.position.x) || (moveVector.x < 0.0f);
+
+            return canMoveLeft && canMoveRight;
         }
     }
 }
