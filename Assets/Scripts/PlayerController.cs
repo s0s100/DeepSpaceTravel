@@ -11,9 +11,15 @@ namespace Player
         private PlayerData m_playerData;
         private Vector2 m_moveTouchPos = Vector2.zero;
 
+        //Variables for on controller movement
+        private Vector2 defaultPlayerPos;
+        private Vector2 defaultTouchPos;
+        private bool isStickControl = false;
+
         private void Awake()
         {
             m_playerData = GetComponent<PlayerData>();
+            defaultPlayerPos = transform.position;
         }
 
         private void Start()
@@ -40,16 +46,23 @@ namespace Player
             touchInputManager.OnTouchStart.Subscribe(touchPosition =>
             {
                 m_moveTouchPos = ScreenInfo.GetWorldTouchPos(touchPosition);
+                defaultTouchPos = ScreenInfo.GetWorldTouchPos(touchPosition);
             });
 
             touchInputManager.OnTouchMove.Subscribe(touchPosition =>
             {
                 m_moveTouchPos = ScreenInfo.GetWorldTouchPos(touchPosition);
+                if (!isStickControl) {
+                    defaultPlayerPos = defaultTouchPos;
+                    isStickControl = true;
+                }
             });
 
             touchInputManager.OnTouchEnd.Subscribe(touchPosition =>
             {
                 StopMovement();
+                isStickControl = false;
+                defaultPlayerPos = transform.position;
             });
         }
 
@@ -60,11 +73,15 @@ namespace Player
 
         private float CalculatDirection()
         {
-            if (m_moveTouchPos.x > transform.position.x + minTouchDistance)
+            //if (m_moveTouchPos.x > transform.position.x + minTouchDistance)
+            //    return 1.0f;
+            //else if (m_moveTouchPos.x < transform.position.x - minTouchDistance)
+            //    return -1.0f;
+            if (m_moveTouchPos.x > defaultPlayerPos.x + minTouchDistance)
                 return 1.0f;
-            else if (m_moveTouchPos.x < transform.position.x - minTouchDistance)
+            else if (m_moveTouchPos.x < defaultPlayerPos.x - minTouchDistance)
                 return -1.0f;
-            
+
             return 0.0f;
         }
 
@@ -94,5 +111,3 @@ namespace Player
         }
     }
 }
-
-
