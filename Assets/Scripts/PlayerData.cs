@@ -7,7 +7,6 @@ namespace Player
     {
         [SerializeField] private int curHealth = 1;
         [SerializeField] private int maxHealth = 1;
-
         [SerializeField] private float speed = 1.0f;
 
         public float Speed => speed;
@@ -29,6 +28,15 @@ namespace Player
         private void Death()
         {
             Debug.Log("The game is over!");
+        }
+
+        // Uses player box collider to define player object boundaries
+        public float CalculateXSize()
+        {
+            if (TryGetComponent<BoxCollider2D>(out var collider))
+                return collider.size.x * transform.localScale.x;
+
+            return 0.0f;
         }
     }
 }
