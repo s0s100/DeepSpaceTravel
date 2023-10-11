@@ -1,5 +1,6 @@
 using UnityEngine;
 using UniRx;
+using System;
 
 namespace Player
 {
@@ -12,7 +13,7 @@ namespace Player
 
     public class PlayerController : MonoBehaviour
     {
-        [Header("For now change those values before running the game")]
+        [Header("Change these values before running the game")]
         [Tooltip("Min required distance between player position / start touch position and current touch position to move player")]
         [SerializeField] private float minTouchDistance = 0.1f;
 
@@ -24,6 +25,8 @@ namespace Player
         private PlayerData m_playerData;
         private Vector2 m_moveTouchPos = Vector2.zero;
         private Vector2 m_startTouchPos = Vector2.zero;
+
+        private IDisposable m_movementSubscription;
 
         private void Awake()
         {
@@ -38,10 +41,15 @@ namespace Player
 
         private void SubscribeToMovement()
         {
+            if (m_movementSubscription != null)
+            {
+                m_movementSubscription.Dispose();
+            }
+
             switch (movementType)
             {
                 case MovementType.LimitedSpeed:
-                    var limitedMovementObservator = Observable
+                    m_movementSubscription = Observable
                     .EveryUpdate()
                     .Subscribe(_ =>
                     {
@@ -49,7 +57,7 @@ namespace Player
                     });
                     break;
                 case MovementType.UnlimitedSpeed:
-                    var unlimitedMovementObservator = Observable
+                    m_movementSubscription = Observable
                     .EveryUpdate()
                     .Subscribe(_ =>
                     {
@@ -57,7 +65,7 @@ namespace Player
                     });
                     break;
                 case MovementType.Joystick:
-                    var joystickMovementObservator = Observable
+                    m_movementSubscription = Observable
                     .EveryUpdate()
                     .Subscribe(_ =>
                     {
@@ -68,8 +76,6 @@ namespace Player
                     Debug.LogWarning("Unknown Movement Type: " + movementType);
                     break;
             }
-
-
         }
 
         private void SubscribeToTouchInputManager()
@@ -158,6 +164,11 @@ namespace Player
             bool canMoveRight = (maxXScreenPos - playerXBoundary > newPosition.x);
 
             return canMoveLeft && canMoveRight;
+        }
+
+        private void OnDestroy()
+        {
+            m_movementSubscription.Dispose();
         }
     }
 }
