@@ -15,14 +15,43 @@ public static class ScreenInfo
         return cameraPos.x;
     }
 
+    // For now get a negative value of GetMaxXPos due to symmetric camera location
+    public static float GetMinXPos()
+    {
+        return -GetMaxXPos();
+    }
+
     public static Vector2 GetWorldTouchPos(Vector2 screenTouchPos)
     {
         return Camera.main.ScreenToWorldPoint(screenTouchPos);
     }
 
-    // For now get a negative value of GetMaxXPos due to symmetric camera location
-    public static float GetMinXPos()
+    public static float GetFullScreenScale(Sprite sprite)
     {
-        return -GetMaxXPos();
+        if (sprite == null)
+        {
+            Debug.LogError("Sprite is not found");
+            return 0.0f;
+        }
+
+
+        // Get the screen dimensions
+        float screenHeight = Camera.main.orthographicSize * 2.0f;
+        float screenWidth = screenHeight * Screen.width / Screen.height;
+
+        // Get the size of the sprite
+        float spriteWidth = sprite.bounds.size.x;
+        float spriteHeight = sprite.bounds.size.y;
+
+        // Calculate the desired scale to fill the screen
+        float scaleX = screenWidth / spriteWidth;
+        float scaleY = screenHeight / spriteHeight;
+
+        // Use the larger scale value to maintain aspect ratio
+        float scale = Mathf.Max(scaleX, scaleY);
+
+        // Set the scale of the sprite
+        //backgroundRenderer.transform.localScale = new Vector3(scale, scale, 1f);
+        return scale;
     }
 }
