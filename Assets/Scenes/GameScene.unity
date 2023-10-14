@@ -168,6 +168,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   backgroundSprite: {fileID: 21300000, guid: 5dcd6e99c5f37d14b82a43adb1122981, type: 3}
+  foregroundSprites:
+  - {fileID: 21300000, guid: 8456e7faa29c2ff47aa23fff6b42d306, type: 3}
+  - {fileID: 21300000, guid: 9e53e92058595eb4aab066afa4a1c097, type: 3}
+  - {fileID: 21300000, guid: 8d1e2a2079918f54d9fd12b685413fb5, type: 3}
 --- !u!1 &834686706
 GameObject:
   m_ObjectHideFlags: 0
