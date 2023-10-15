@@ -27,15 +27,18 @@ public class BackgroundManager : MonoBehaviour
 
     private void GenerateCloud()
     {
-        GameObject foregroundObject = new GameObject("Foreground Cloud");
-        SpriteRenderer foregroundRenderer = foregroundObject.AddComponent<SpriteRenderer>();
+        var foregroundObject = new GameObject("Foreground Cloud");
+        var foregroundRenderer = foregroundObject.AddComponent<SpriteRenderer>();
+        var cloudMovement = foregroundObject.AddComponent<CloudMovement>();
 
         foregroundObject.transform.parent = transform;
         foregroundObject.transform.position = Vector2.zero;
+
         foregroundRenderer.sprite = RandomForegroundSprite();
         foregroundRenderer.sortingLayerName = "Foreground";
 
-
+        cloudMovement.MovementSpeed = foregroundMovementSpeed;
+        cloudMovement.DeletionTime = foregroundExistanceTime;
     }
 
     private Sprite RandomForegroundSprite()
@@ -52,8 +55,8 @@ public class BackgroundManager : MonoBehaviour
 
     private void GenerateBackground()
     {
-        GameObject backgroundObject = new GameObject("Background Image");
-        SpriteRenderer backgroundRenderer = backgroundObject.AddComponent<SpriteRenderer>();
+        var backgroundObject = new GameObject("Background Image");
+        var backgroundRenderer = backgroundObject.AddComponent<SpriteRenderer>();
         
         backgroundObject.transform.parent = transform;
         backgroundRenderer.sprite = backgroundSprite;
