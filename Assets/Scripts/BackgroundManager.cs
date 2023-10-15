@@ -4,7 +4,7 @@ using System;
 
 public class BackgroundManager : MonoBehaviour
 {
-    private const float CLOUD_SIZE_INCREASEMENT = 2.0f;
+    private const float CLOUD_SIZE_INCREASEMENT = 5.0f;
     private const float DEFAULT_GENERATED_SHIFT = 2.0f;
 
     [SerializeField] private float foregroundGenerationTime = 2.0f;
