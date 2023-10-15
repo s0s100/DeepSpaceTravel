@@ -3,20 +3,45 @@ using UnityEngine;
 // Class to retreive screen information such as width, height and so on
 public static class ScreenInfo
 {
+    private static float maxXPos = 0.0f;
+    private static float maxYPos = 0.0f;
+
     public static float GetMaxXPos()
     {
-        Camera camera = Camera.main;
-        float screenSize = Screen.width;
-        Vector3 rightScreenPos = new(screenSize, 0, 0);
-        Vector3 cameraPos = camera.ScreenToWorldPoint(rightScreenPos);
+        if (maxXPos == 0.0f)
+        {
+            Camera camera = Camera.main;
+            float screenSize = Screen.width;
+            Vector3 rightScreenPos = new(screenSize, 0, 0);
+            Vector3 cameraPos = camera.ScreenToWorldPoint(rightScreenPos);
+            maxXPos = cameraPos.x;
+        }
 
-        return cameraPos.x;
+        return maxXPos;
     }
 
-    // For now get a negative value of GetMaxXPos due to symmetric camera location
     public static float GetMinXPos()
     {
         return -GetMaxXPos();
+    }
+
+    public static float GetMaxYPos()
+    {
+        if (maxYPos == 0.0f)
+        {
+            Camera camera = Camera.main;
+            float screenSize = Screen.height;
+            Vector3 topScreenPos = new(0, screenSize, 0);
+            Vector3 cameraPos = camera.ScreenToWorldPoint(topScreenPos);
+            maxYPos = cameraPos.y;
+        }
+
+        return maxYPos;
+    }
+
+    public static float GetMinYPos()
+    {
+        return -GetMaxYPos();
     }
 
     public static Vector2 GetWorldTouchPos(Vector2 screenTouchPos)

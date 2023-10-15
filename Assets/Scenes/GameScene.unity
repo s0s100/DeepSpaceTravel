@@ -167,6 +167,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 837e7f3bf4d73cf44b088da249e5ff40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  foregroundGenerationTime: 2.5
+  foregroundExistanceTime: 10
+  foregroundMovementSpeed: 1.5
   backgroundSprite: {fileID: 21300000, guid: 5dcd6e99c5f37d14b82a43adb1122981, type: 3}
   foregroundSprites:
   - {fileID: 21300000, guid: 8456e7faa29c2ff47aa23fff6b42d306, type: 3}

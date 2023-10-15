@@ -1,14 +1,20 @@
 using UnityEngine;
 using UniRx;
+using System;
 
 public class BackgroundManager : MonoBehaviour
 {
+    private const float CLOUD_SIZE_INCREASEMENT = 2.0f;
+    private const float DEFAULT_GENERATED_SHIFT = 2.0f;
+
     [SerializeField] private float foregroundGenerationTime = 2.0f;
     [SerializeField] private float foregroundExistanceTime = 10.0f;
-    [SerializeField] private float foregroundMovementSpeed = 0.5f;
+    [SerializeField] private float foregroundMovementSpeed = 1.0f;
 
     [SerializeField] private Sprite backgroundSprite;
     [SerializeField] private Sprite[] foregroundSprites;
+
+    IDisposable cloudSubsctiption;
 
     private void Start()
     {
@@ -19,7 +25,7 @@ public class BackgroundManager : MonoBehaviour
     private void PeriodicallyGenerateClouds()
     {
         var timer = Observable.Interval(System.TimeSpan.FromSeconds(foregroundGenerationTime));
-        timer.Subscribe(_ =>
+        cloudSubsctiption = timer.Subscribe(_ =>
         {
             GenerateCloud();
         }).AddTo(this);
@@ -33,6 +39,8 @@ public class BackgroundManager : MonoBehaviour
 
         foregroundObject.transform.parent = transform;
         foregroundObject.transform.position = Vector2.zero;
+        foregroundObject.transform.localScale *= CLOUD_SIZE_INCREASEMENT;
+        foregroundObject.transform.position = GetRandomTopPosition();
 
         foregroundRenderer.sprite = RandomForegroundSprite();
         foregroundRenderer.sortingLayerName = "Foreground";
@@ -43,14 +51,26 @@ public class BackgroundManager : MonoBehaviour
 
     private Sprite RandomForegroundSprite()
     {
-        int randomNum = Random.Range(0, foregroundSprites.Length);
+        int randomNum = UnityEngine.Random.Range(0, foregroundSprites.Length);
         return foregroundSprites[randomNum];
     }
 
     private Vector2 GetRandomTopPosition()
     {
-        //float topPosition = ScreenInfo.
-        return Vector2.zero;
+        float minXValue = ScreenInfo.GetMinXPos();
+        float maxXValue = ScreenInfo.GetMaxXPos();
+        float maxYValue = ScreenInfo.GetMaxYPos();
+
+        maxYValue += DEFAULT_GENERATED_SHIFT;
+        float randomXPos = UnityEngine.Random.Range(minXValue, maxXValue);
+        Vector2 randomPos = new(randomXPos, maxYValue);
+
+        Debug.Log(ScreenInfo.GetMinXPos());
+        Debug.Log(ScreenInfo.GetMaxXPos());
+        Debug.Log(ScreenInfo.GetMinYPos());
+        Debug.Log(ScreenInfo.GetMaxYPos());
+
+        return randomPos;
     }
 
     private void GenerateBackground()
@@ -63,5 +83,10 @@ public class BackgroundManager : MonoBehaviour
 
         float spriteScale = ScreenInfo.GetFullScreenScale(backgroundRenderer.sprite);
         backgroundRenderer.transform.localScale = new Vector3(spriteScale, spriteScale, 1f);
+    }
+
+    private void OnDestroy()
+    {
+        cloudSubsctiption.Dispose();
     }
 }
