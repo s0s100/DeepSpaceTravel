@@ -65,11 +65,6 @@ public class BackgroundManager : MonoBehaviour
         float randomXPos = UnityEngine.Random.Range(minXValue, maxXValue);
         Vector2 randomPos = new(randomXPos, maxYValue);
 
-        Debug.Log(ScreenInfo.GetMinXPos());
-        Debug.Log(ScreenInfo.GetMaxXPos());
-        Debug.Log(ScreenInfo.GetMinYPos());
-        Debug.Log(ScreenInfo.GetMaxYPos());
-
         return randomPos;
     }
 
@@ -79,7 +74,9 @@ public class BackgroundManager : MonoBehaviour
         var backgroundRenderer = backgroundObject.AddComponent<SpriteRenderer>();
         
         backgroundObject.transform.parent = transform;
+
         backgroundRenderer.sprite = backgroundSprite;
+        backgroundRenderer.sortingLayerName = "Background";
 
         float spriteScale = ScreenInfo.GetFullScreenScale(backgroundRenderer.sprite);
         backgroundRenderer.transform.localScale = new Vector3(spriteScale, spriteScale, 1f);
