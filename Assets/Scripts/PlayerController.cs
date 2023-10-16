@@ -25,6 +25,7 @@ namespace Player
         private PlayerData m_playerData;
         private Vector2 m_moveTouchPos = Vector2.zero;
         private Vector2 m_startTouchPos = Vector2.zero;
+        private Vector2 m_startPlayerPosition = Vector2.zero;
 
         private IDisposable m_movementSubscription;
 
@@ -86,6 +87,7 @@ namespace Player
             {
                 m_moveTouchPos = ScreenInfo.GetWorldTouchPos(touchPosition);
                 m_startTouchPos = m_moveTouchPos;
+                m_startPlayerPosition = transform.position;
             });
 
             touchInputManager.OnTouchMove.Subscribe(touchPosition =>
@@ -103,6 +105,7 @@ namespace Player
         {
             m_moveTouchPos = transform.position;
             m_startTouchPos = transform.position;
+            m_startPlayerPosition = transform.position;
         }
 
         // xComparePosition is the point in world coordinates according to which direction is calculated
@@ -133,7 +136,8 @@ namespace Player
         private void UnlimitedSpeedMove()
         {
             Vector2 newLocation = transform.position;
-            newLocation.x = m_moveTouchPos.x;
+            float difference = m_startTouchPos.x - m_moveTouchPos.x;
+            newLocation.x = m_startPlayerPosition.x - difference;
 
             if (CanMove(newLocation))
                 transform.position = newLocation;
