@@ -47,6 +47,7 @@ namespace Player
         {
             m_playerData = GetComponent<PlayerData>();
             PopulateActionDictionary();
+            TestStart();
         }
 
         private void Start()
@@ -150,19 +151,49 @@ namespace Player
 
         // Not optimized version
         public float f = 0.5f, c = 0.15f, r = 2f;
-        public float xVelocity = 1.0f, xAcceleration = 1.0f;
-        private float xCur, xNew;
+        private double k1, k2, k3;
+        private float xCur, xNew, Vx;
+        private float y, Vy;
+        private float t;
+
+        private void TestStart()
+        {
+            // Defining basic values
+            y = transform.position.x;
+            t = Time.deltaTime;
+        }
 
         private void TestMovement()
         {
             // Caclulate default constunts
-            var k1 = c / (Math.PI * f);
-            var k2 = 1f / Math.Pow(2f * Math.PI * f, 2);
-            var k3 = (r * c) / (2 * Math.PI * f);
+            k1 = c / (Math.PI * f);
+            k2 = 1f / Math.Pow(2f * Math.PI * f, 2);
+            k3 = (r * c) / (2 * Math.PI * f);
 
-            // Define start and end positions
             xCur = transform.position.x;
             xNew = m_moveTouchPos.x;
+
+            // Calculations
+            Vx = (xNew - xCur) / t;
+            if (Vx == 0.0f)
+            {
+                Vy = 0;
+                return;
+            }
+
+            y = y + t * Vy;
+            Vy = (float) (y + (t * (xNew + k3 * Vx - y - k1 * Vy) / k2));
+
+            // Check variables
+            Debug.Log("------------------------");
+            Debug.Log("xCur = " + xCur + " xNew = " + xNew + " Vx = " + Vx + "\n");
+            Debug.Log("y = " + y + " Vy = " + Vy + "\n");
+            Debug.Log("k1 = " + k1 + " k2 = " + k2 + " k3 = " + k3 + " t = " + t);
+
+            // Change current location
+            var location = transform.position;
+            location.x = y;
+            transform.position = location;
         }
 
         private bool CanMove(Vector2 newPosition)
@@ -184,5 +215,3 @@ namespace Player
         }
     }
 }
-
-
