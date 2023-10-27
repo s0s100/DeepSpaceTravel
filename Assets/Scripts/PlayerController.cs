@@ -1,6 +1,7 @@
 using UnityEngine;
 using UniRx;
 using System;
+using System.Collections.Generic;
 
 namespace Player
 {
@@ -8,7 +9,8 @@ namespace Player
     {
         LimitedSpeed,
         UnlimitedSpeed,
-        Joystick
+        Joystick,
+        TestMovement
     }
 
     public class PlayerController : MonoBehaviour
@@ -22,16 +24,29 @@ namespace Player
             "Joystick - Movement which stores first touch location as joystick center")]
         [SerializeField] private MovementType movementType = MovementType.LimitedSpeed;
 
+        // Used to simplify control type with lambda function
+        private Dictionary<MovementType, Action> actionDictionary = new();
+        // Movement subscription
+        private IDisposable m_movementSubscription;
+
         private PlayerData m_playerData;
         private Vector2 m_moveTouchPos = Vector2.zero;
         private Vector2 m_startTouchPos = Vector2.zero;
         private Vector2 m_startPlayerPosition = Vector2.zero;
 
-        private IDisposable m_movementSubscription;
+
+        private void PopulateActionDictionary()
+        {
+            actionDictionary[MovementType.LimitedSpeed] = () => LimitedSpeedMove();
+            actionDictionary[MovementType.UnlimitedSpeed] = () => UnlimitedSpeedMove();
+            actionDictionary[MovementType.Joystick] = () => JoystickMove();
+            actionDictionary[MovementType.TestMovement] = () => TestMovement();
+        }
 
         private void Awake()
         {
             m_playerData = GetComponent<PlayerData>();
+            PopulateActionDictionary();
         }
 
         private void Start()
@@ -43,40 +58,15 @@ namespace Player
         private void SubscribeToMovement()
         {
             if (m_movementSubscription != null)
-            {
                 m_movementSubscription.Dispose();
-            }
 
-            switch (movementType)
-            {
-                case MovementType.LimitedSpeed:
-                    m_movementSubscription = Observable
+            var moveAction = actionDictionary[movementType];
+            m_movementSubscription = Observable
                     .EveryUpdate()
                     .Subscribe(_ =>
                     {
-                        LimitedSpeedMove();
+                        moveAction();
                     });
-                    break;
-                case MovementType.UnlimitedSpeed:
-                    m_movementSubscription = Observable
-                    .EveryUpdate()
-                    .Subscribe(_ =>
-                    {
-                        UnlimitedSpeedMove();
-                    });
-                    break;
-                case MovementType.Joystick:
-                    m_movementSubscription = Observable
-                    .EveryUpdate()
-                    .Subscribe(_ =>
-                    {
-                        JoystickMove();
-                    });
-                    break;
-                default:
-                    Debug.LogWarning("Unknown Movement Type: " + movementType);
-                    break;
-            }
         }
 
         private void SubscribeToTouchInputManager()
@@ -155,6 +145,24 @@ namespace Player
 
             if (CanMove(newLocation))
                 transform.Translate(moveVector);
+        }
+
+
+        // Not optimized version
+        public float f = 0.5f, c = 0.15f, r = 2f;
+        public float xVelocity = 1.0f, xAcceleration = 1.0f;
+        private float xCur, xNew;
+
+        private void TestMovement()
+        {
+            // Caclulate default constunts
+            var k1 = c / (Math.PI * f);
+            var k2 = 1f / Math.Pow(2f * Math.PI * f, 2);
+            var k3 = (r * c) / (2 * Math.PI * f);
+
+            // Define start and end positions
+            xCur = transform.position.x;
+            xNew = m_moveTouchPos.x;
         }
 
         private bool CanMove(Vector2 newPosition)

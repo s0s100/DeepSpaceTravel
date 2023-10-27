@@ -371,7 +371,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minTouchDistance: 0.05
-  movementType: 0
+  movementType: 2
+  f: 0.5
+  c: 0.15
+  r: 2
+  xVelocity: 1
+  xAcceleration: 1
 --- !u!114 &834686711
 MonoBehaviour:
   m_ObjectHideFlags: 0
