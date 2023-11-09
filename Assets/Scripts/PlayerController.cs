@@ -1,6 +1,7 @@
 using UnityEngine;
 using UniRx;
 using System;
+using System.Collections.Generic;
 
 namespace Player
 {
@@ -8,7 +9,8 @@ namespace Player
     {
         LimitedSpeed,
         UnlimitedSpeed,
-        Joystick
+        Joystick,
+        ImprovedMovement
     }
 
     public class PlayerController : MonoBehaviour
@@ -22,16 +24,30 @@ namespace Player
             "Joystick - Movement which stores first touch location as joystick center")]
         [SerializeField] private MovementType movementType = MovementType.LimitedSpeed;
 
+        // Used to simplify control type with lambda function
+        private Dictionary<MovementType, Action> actionDictionary = new();
+        // Movement subscription
+        private IDisposable m_movementSubscription;
+
         private PlayerData m_playerData;
         private Vector2 m_moveTouchPos = Vector2.zero;
         private Vector2 m_startTouchPos = Vector2.zero;
         private Vector2 m_startPlayerPosition = Vector2.zero;
 
-        private IDisposable m_movementSubscription;
+
+        private void PopulateActionDictionary()
+        {
+            actionDictionary[MovementType.LimitedSpeed] = () => LimitedSpeedMove();
+            actionDictionary[MovementType.UnlimitedSpeed] = () => UnlimitedSpeedMove();
+            actionDictionary[MovementType.Joystick] = () => JoystickMove();
+            actionDictionary[MovementType.ImprovedMovement] = () => ImprovedMovement();
+        }
 
         private void Awake()
         {
             m_playerData = GetComponent<PlayerData>();
+            PopulateActionDictionary();
+            ImprovedMovementSetup();
         }
 
         private void Start()
@@ -40,43 +56,23 @@ namespace Player
             SubscribeToMovement();
         }
 
+        private void OnDestroy()
+        {
+            m_movementSubscription.Dispose();
+        }
+
         private void SubscribeToMovement()
         {
             if (m_movementSubscription != null)
-            {
                 m_movementSubscription.Dispose();
-            }
 
-            switch (movementType)
-            {
-                case MovementType.LimitedSpeed:
-                    m_movementSubscription = Observable
+            var moveAction = actionDictionary[movementType];
+            m_movementSubscription = Observable
                     .EveryUpdate()
                     .Subscribe(_ =>
                     {
-                        LimitedSpeedMove();
+                        moveAction();
                     });
-                    break;
-                case MovementType.UnlimitedSpeed:
-                    m_movementSubscription = Observable
-                    .EveryUpdate()
-                    .Subscribe(_ =>
-                    {
-                        UnlimitedSpeedMove();
-                    });
-                    break;
-                case MovementType.Joystick:
-                    m_movementSubscription = Observable
-                    .EveryUpdate()
-                    .Subscribe(_ =>
-                    {
-                        JoystickMove();
-                    });
-                    break;
-                default:
-                    Debug.LogWarning("Unknown Movement Type: " + movementType);
-                    break;
-            }
         }
 
         private void SubscribeToTouchInputManager()
@@ -101,6 +97,19 @@ namespace Player
             });
         }
 
+        private bool CanMove(Vector2 newPosition)
+        {
+            // Divided by 2 to have a bounary between screen and the right side of the screen equal to 2
+            float playerXBoundary = m_playerData.CalculateXSize() / 2;
+            float maxXScreenPos = ScreenInfo.GetMaxXPos();
+            float minXScreenPos = ScreenInfo.GetMinXPos();
+
+            bool canMoveLeft = (minXScreenPos + playerXBoundary < newPosition.x);
+            bool canMoveRight = (maxXScreenPos - playerXBoundary > newPosition.x);
+
+            return canMoveLeft && canMoveRight;
+        }
+
         private void StopMovement()
         {
             m_moveTouchPos = transform.position;
@@ -108,7 +117,6 @@ namespace Player
             m_startPlayerPosition = transform.position;
         }
 
-        // xComparePosition is the point in world coordinates according to which direction is calculated
         private float CalculatDirection(Vector2 comparePosition)
         {
             if (m_moveTouchPos.x > comparePosition.x + minTouchDistance)
@@ -127,7 +135,7 @@ namespace Player
 
             float movement = moveDirection * Time.deltaTime * m_playerData.Speed;
             Vector3 moveVector = movement * Vector2.right;
-            Vector2 newLocation = transform.position + moveVector;
+            Vector2 newLocation = transform.position + moveVector; 
 
             if (CanMove(newLocation)) 
                 transform.Translate(moveVector);
@@ -157,24 +165,49 @@ namespace Player
                 transform.Translate(moveVector);
         }
 
-        private bool CanMove(Vector2 newPosition)
+        // Physics movement
+        [SerializeField]
+        private float f = 0.5f, c = 0.15f, r = 2f;
+        private float k1, k2, k3;
+        private float xSpeed;
+        private float yPos, yVel, yAcc;
+
+        private void ImprovedMovementSetup()
         {
-            // Divided by 2 to have a bounary between screen and the right side of the screen equal to 2
-            float playerXBoundary = m_playerData.CalculateXSize() / 2;
-            float maxXScreenPos = ScreenInfo.GetMaxXPos();
-            float minXScreenPos = ScreenInfo.GetMinXPos();
+            // Caclulate default constunts
+            k1 = c / (float) (Math.PI * f);
+            k2 = 1f / (float) Math.Pow(2f * Math.PI * f, 2);
+            k3 = (r * c) / (float) (2 * Math.PI * f);
 
-            bool canMoveLeft = (minXScreenPos + playerXBoundary < newPosition.x);
-            bool canMoveRight = (maxXScreenPos - playerXBoundary > newPosition.x);
-
-            return canMoveLeft && canMoveRight;
+            yPos = transform.position.x;
+            yVel = 0.0f;
+            yAcc = 0.0f;
         }
 
-        private void OnDestroy()
+        // X Refers to basic limited movement while Y to improved movement
+        private void ImprovedMovement()
         {
-            m_movementSubscription.Dispose();
+            float xDirection = CalculatDirection(m_moveTouchPos);
+            if (xDirection != 0.0f)
+                xSpeed = xDirection * m_playerData.Speed;
+            else
+                xSpeed = 0.0f;
+
+            yPos += yVel * Time.deltaTime;
+            yAcc = (m_moveTouchPos.x + k3 * xSpeed - yPos - k1 * yVel) / k2;
+            yVel += yAcc * Time.deltaTime;
+
+            Vector3 moveVector = (yPos - transform.position.x) * Vector3.right;
+            Vector2 newLocation = transform.position + moveVector;
+
+            if (CanMove(newLocation))
+                transform.Translate(moveVector);
+
+            // Checking values
+            //Debug.Log("X Velocity: " + xSpeed);
+            //Debug.Log("Y Position: " + yPos + " , Y Velocity: " + yVel + " , Y Acceleration " + yAcc);
+            //Debug.Log("Move vector: " + moveVector.ToString() + " New Location: " + newLocation.ToString());
+            //Debug.Log("--------------------");
         }
     }
 }
-
-
