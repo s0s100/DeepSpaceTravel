@@ -10,7 +10,7 @@ namespace Player
         LimitedSpeed,
         UnlimitedSpeed,
         Joystick,
-        TestMovement
+        ImprovedMovement
     }
 
     public class PlayerController : MonoBehaviour
@@ -40,20 +40,25 @@ namespace Player
             actionDictionary[MovementType.LimitedSpeed] = () => LimitedSpeedMove();
             actionDictionary[MovementType.UnlimitedSpeed] = () => UnlimitedSpeedMove();
             actionDictionary[MovementType.Joystick] = () => JoystickMove();
-            actionDictionary[MovementType.TestMovement] = () => TestMovement();
+            actionDictionary[MovementType.ImprovedMovement] = () => ImprovedMovement();
         }
 
         private void Awake()
         {
             m_playerData = GetComponent<PlayerData>();
             PopulateActionDictionary();
-            TestStart();
+            ImprovedMovementSetup();
         }
 
         private void Start()
         {
             SubscribeToTouchInputManager();
             SubscribeToMovement();
+        }
+
+        private void OnDestroy()
+        {
+            m_movementSubscription.Dispose();
         }
 
         private void SubscribeToMovement()
@@ -92,6 +97,19 @@ namespace Player
             });
         }
 
+        private bool CanMove(Vector2 newPosition)
+        {
+            // Divided by 2 to have a bounary between screen and the right side of the screen equal to 2
+            float playerXBoundary = m_playerData.CalculateXSize() / 2;
+            float maxXScreenPos = ScreenInfo.GetMaxXPos();
+            float minXScreenPos = ScreenInfo.GetMinXPos();
+
+            bool canMoveLeft = (minXScreenPos + playerXBoundary < newPosition.x);
+            bool canMoveRight = (maxXScreenPos - playerXBoundary > newPosition.x);
+
+            return canMoveLeft && canMoveRight;
+        }
+
         private void StopMovement()
         {
             m_moveTouchPos = transform.position;
@@ -99,7 +117,6 @@ namespace Player
             m_startPlayerPosition = transform.position;
         }
 
-        // xComparePosition is the point in world coordinates according to which direction is calculated
         private float CalculatDirection(Vector2 comparePosition)
         {
             if (m_moveTouchPos.x > comparePosition.x + minTouchDistance)
@@ -118,7 +135,7 @@ namespace Player
 
             float movement = moveDirection * Time.deltaTime * m_playerData.Speed;
             Vector3 moveVector = movement * Vector2.right;
-            Vector2 newLocation = transform.position + moveVector;
+            Vector2 newLocation = transform.position + moveVector; 
 
             if (CanMove(newLocation)) 
                 transform.Translate(moveVector);
@@ -148,70 +165,49 @@ namespace Player
                 transform.Translate(moveVector);
         }
 
+        // Physics movement
+        [SerializeField]
+        private float f = 0.5f, c = 0.15f, r = 2f;
+        private float k1, k2, k3;
+        private float xSpeed;
+        private float yPos, yVel, yAcc;
 
-        // Not optimized version
-        public float f = 0.5f, c = 0.15f, r = 2f;
-        private double k1, k2, k3;
-        private float xCur, xNew, Vx;
-        private float y, Vy;
-        private float t;
-
-        private void TestStart()
-        {
-            // Defining basic values
-            y = transform.position.x;
-            t = Time.deltaTime;
-        }
-
-        private void TestMovement()
+        private void ImprovedMovementSetup()
         {
             // Caclulate default constunts
-            k1 = c / (Math.PI * f);
-            k2 = 1f / Math.Pow(2f * Math.PI * f, 2);
-            k3 = (r * c) / (2 * Math.PI * f);
+            k1 = c / (float) (Math.PI * f);
+            k2 = 1f / (float) Math.Pow(2f * Math.PI * f, 2);
+            k3 = (r * c) / (float) (2 * Math.PI * f);
 
-            xCur = transform.position.x;
-            xNew = m_moveTouchPos.x;
-
-            // Calculations
-            Vx = (xNew - xCur) / t;
-            if (Vx == 0.0f)
-            {
-                Vy = 0;
-                return;
-            }
-
-            y = y + t * Vy;
-            Vy = (float) (y + (t * (xNew + k3 * Vx - y - k1 * Vy) / k2));
-
-            // Check variables
-            Debug.Log("------------------------");
-            Debug.Log("xCur = " + xCur + " xNew = " + xNew + " Vx = " + Vx + "\n");
-            Debug.Log("y = " + y + " Vy = " + Vy + "\n");
-            Debug.Log("k1 = " + k1 + " k2 = " + k2 + " k3 = " + k3 + " t = " + t);
-
-            // Change current location
-            var location = transform.position;
-            location.x = y;
-            transform.position = location;
+            yPos = transform.position.x;
+            yVel = 0.0f;
+            yAcc = 0.0f;
         }
 
-        private bool CanMove(Vector2 newPosition)
+        // X Refers to basic limited movement while Y to improved movement
+        private void ImprovedMovement()
         {
-            // Divided by 2 to have a bounary between screen and the right side of the screen equal to 2
-            float playerXBoundary = m_playerData.CalculateXSize() / 2;
-            float maxXScreenPos = ScreenInfo.GetMaxXPos();
-            float minXScreenPos = ScreenInfo.GetMinXPos();
+            float xDirection = CalculatDirection(m_moveTouchPos);
+            if (xDirection != 0.0f)
+                xSpeed = xDirection * m_playerData.Speed;
+            else
+                xSpeed = 0.0f;
 
-            bool canMoveLeft = (minXScreenPos + playerXBoundary < newPosition.x);
-            bool canMoveRight = (maxXScreenPos - playerXBoundary > newPosition.x);
+            yPos += yVel * Time.deltaTime;
+            yAcc = (m_moveTouchPos.x + k3 * xSpeed - yPos - k1 * yVel) / k2;
+            yVel += yAcc * Time.deltaTime;
 
-            return canMoveLeft && canMoveRight;
-        }
+            Vector3 moveVector = (yPos - transform.position.x) * Vector3.right;
+            Vector2 newLocation = transform.position + moveVector;
 
-        private void OnDestroy()
-        {
-            m_movementSubscription.Dispose();
+            if (CanMove(newLocation))
+                transform.Translate(moveVector);
+
+            // Checking values
+            //Debug.Log("X Velocity: " + xSpeed);
+            //Debug.Log("Y Position: " + yPos + " , Y Velocity: " + yVel + " , Y Acceleration " + yAcc);
+            //Debug.Log("Move vector: " + moveVector.ToString() + " New Location: " + newLocation.ToString());
+            //Debug.Log("--------------------");
         }
     }
 }
