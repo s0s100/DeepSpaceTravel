@@ -133,8 +133,9 @@ GameObject:
   m_Component:
   - component: {fileID: 206292244}
   - component: {fileID: 206292245}
+  - component: {fileID: 206292246}
   m_Layer: 0
-  m_Name: Background
+  m_Name: Game Controller
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -175,6 +176,20 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 8456e7faa29c2ff47aa23fff6b42d306, type: 3}
   - {fileID: 21300000, guid: 9e53e92058595eb4aab066afa4a1c097, type: 3}
   - {fileID: 21300000, guid: 8d1e2a2079918f54d9fd12b685413fb5, type: 3}
+--- !u!114 &206292246
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 206292243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8dc425fe6f7cff48af28fac50854e86, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  generationPatterns:
+  - {fileID: 11400000, guid: 5762f8ddce212c64d8abeb13bdcbc0f1, type: 2}
 --- !u!1 &800541025
 GameObject:
   m_ObjectHideFlags: 0
@@ -446,7 +461,7 @@ GameObject:
   - component: {fileID: 1482517241}
   - component: {fileID: 1482517242}
   m_Layer: 0
-  m_Name: RocketFire
+  m_Name: Rocket Fire
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -532,7 +547,7 @@ GameObject:
   - component: {fileID: 1641785463}
   - component: {fileID: 1641785462}
   m_Layer: 0
-  m_Name: EventSystem
+  m_Name: Event System
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -24,11 +24,11 @@ public class BackgroundManager : MonoBehaviour
 
     private void PeriodicallyGenerateClouds()
     {
-        var timer = Observable.Interval(System.TimeSpan.FromSeconds(foregroundGenerationTime));
+        var timer = Observable.Interval(TimeSpan.FromSeconds(foregroundGenerationTime));
         cloudSubsctiption = timer.Subscribe(_ =>
         {
             GenerateCloud();
-        }).AddTo(this);
+        });
     }
 
     private void GenerateCloud()
