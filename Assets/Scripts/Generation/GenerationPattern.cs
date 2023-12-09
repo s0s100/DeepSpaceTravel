@@ -5,6 +5,8 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "Generation pattern", menuName = "ScriptableObjects/Generation pattern", order = 1)]
 public class GenerationPattern : ScriptableObject
 {
+    private const float SCREEN_TOP_SHIFT = 2.0f;
+
     // Which objects might generate
     [SerializeField]
     private GameObject[] generationObjects;
@@ -20,11 +22,13 @@ public class GenerationPattern : ScriptableObject
 
     // How many objects will spawn at the same time
     [SerializeField]
-    private float minGenerationNum;
+    private int minGenerationNum;
     [SerializeField]
-    private float maxGenerationNum;
+    private int maxGenerationNum;
 
-    public void Initialize()
+    private Transform parentObject;
+
+    public void Initialize(Transform parentObject)
     {
         Observable.Timer(TimeSpan.FromSeconds(timeBeforeGeneration)).Subscribe(_ =>
             {
@@ -47,6 +51,42 @@ public class GenerationPattern : ScriptableObject
 
     private void GenerateObjects()
     {
-        Debug.Log(Time.time);
+        int randomValue = UnityEngine.Random.Range(minGenerationNum, maxGenerationNum + 1);
+        for (int i = 0; i < generationObjects.Length; i++)
+        {
+            GenerateObject();
+        }
     }
+
+    private void GenerateObject()
+    {
+        int maxNumOfObject = generationObjects.Length;
+        if (maxNumOfObject == 0)
+        {
+            Debug.LogWarning("No objects to create");
+            return;
+        }
+
+        int randomValue = UnityEngine.Random.Range(0, maxNumOfObject);
+        Vector2 location = DefineGenerationLocation();
+        GameObject newObject = Instantiate(generationObjects[randomValue], location, Quaternion.identity);
+        newObject.transform.parent = parentObject;
+    }
+
+    private Vector2 DefineGenerationLocation()
+    {
+        Vector2 location = new();
+
+        float minXPos = ScreenInfo.GetMinXPos();
+        float maxXPos = ScreenInfo.GetMaxXPos();
+        float randomXPos = UnityEngine.Random.Range(minXPos, maxXPos);
+
+        float yPos = ScreenInfo.GetMaxXPos() + SCREEN_TOP_SHIFT;
+        
+        location.x = randomXPos;
+        location.y = yPos;
+
+        return location;
+    }
+
 }

@@ -12,7 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 09c756f474c30ea46aa43e684ce7419e, type: 3}
   m_Name: Meteorite generation
   m_EditorClassIdentifier: 
-  generationObjects: []
+  generationObjects:
+  - {fileID: 7355942876648105707, guid: 15f77007b88845b499a3fec9de1a076b, type: 3}
+  - {fileID: 8470342698771839785, guid: 7ba04a63fd330334eb8478a7d468a167, type: 3}
+  - {fileID: 2074758602364643871, guid: b172132b2e7482d4fa8ba8f16e3a58de, type: 3}
   generationTime: 1
   generationRandomTime: 2
   timeBeforeGeneration: 5

@@ -11,7 +11,7 @@ public class GenerationManager : MonoBehaviour
     {
         foreach (var pattern in generationPatterns)
         {
-            pattern.Initialize();
+            pattern.Initialize(transform);
         }
     }
 }

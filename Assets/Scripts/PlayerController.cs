@@ -176,7 +176,7 @@ namespace Player
         {
             // Caclulate default constunts
             k1 = c / (float) (Math.PI * f);
-            k2 = 1f / (float) Math.Pow(2f * Math.PI * f, 2);
+            k2 = 1f / (float) Math.Pow(2f * Math.PI * f, 2);    
             k3 = (r * c) / (float) (2 * Math.PI * f);
 
             yPos = transform.position.x;
