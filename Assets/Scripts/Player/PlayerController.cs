@@ -30,6 +30,7 @@ namespace Player
         private IDisposable m_movementSubscription;
 
         private PlayerData m_playerData;
+        private Rigidbody2D m_rigidbody;
         private Vector2 m_moveTouchPos = Vector2.zero;
         private Vector2 m_startTouchPos = Vector2.zero;
         private Vector2 m_startPlayerPosition = Vector2.zero;
@@ -45,6 +46,7 @@ namespace Player
 
         private void Awake()
         {
+            m_rigidbody = GetComponent<Rigidbody2D>();
             m_playerData = GetComponent<PlayerData>();
             PopulateActionDictionary();
             ImprovedMovementSetup();
@@ -176,7 +178,7 @@ namespace Player
         {
             // Caclulate default constunts
             k1 = c / (float) (Math.PI * f);
-            k2 = 1f / (float) Math.Pow(2f * Math.PI * f, 2);
+            k2 = 1f / (float) Math.Pow(2f * Math.PI * f, 2);    
             k3 = (r * c) / (float) (2 * Math.PI * f);
 
             yPos = transform.position.x;
@@ -201,13 +203,9 @@ namespace Player
             Vector2 newLocation = transform.position + moveVector;
 
             if (CanMove(newLocation))
-                transform.Translate(moveVector);
-
-            // Checking values
-            //Debug.Log("X Velocity: " + xSpeed);
-            //Debug.Log("Y Position: " + yPos + " , Y Velocity: " + yVel + " , Y Acceleration " + yAcc);
-            //Debug.Log("Move vector: " + moveVector.ToString() + " New Location: " + newLocation.ToString());
-            //Debug.Log("--------------------");
+            {
+                m_rigidbody.MovePosition(newLocation);
+            }
         }
     }
 }
