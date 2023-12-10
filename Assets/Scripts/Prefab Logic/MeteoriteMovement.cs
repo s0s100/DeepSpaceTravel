@@ -6,10 +6,10 @@ using UnityEngine;
 
 public class MeteoriteMovement : MonoBehaviour
 {
-    private float maxRotationSpeed = 10.0f;
-    private float xMoveLimit = 1.0f;
-    private float yMoveLimit = 3.0f;
-    private float deletionTime = 10.0f;
+    private float m_maxRotationSpeed = 10.0f;
+    private float m_xMoveLimit = 1.0f;
+    private float m_yMoveLimit = 3.0f;
+    private float m_deletionTime = 10.0f;
 
     Rigidbody2D rb;
 
@@ -18,7 +18,7 @@ public class MeteoriteMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
-        Destroy(gameObject, deletionTime);
+        Destroy(gameObject, m_deletionTime);
         DefaultForceSetup();
 
         m_movementSubscription = Observable
@@ -33,12 +33,10 @@ public class MeteoriteMovement : MonoBehaviour
     {
         Vector2 moveVector = new();
 
-        float xMovement = UnityEngine.Random.Range(-xMoveLimit, xMoveLimit);
-        float yMovement = UnityEngine.Random.Range(-yMoveLimit, 0);
+        float xMovement = UnityEngine.Random.Range(-m_xMoveLimit, m_xMoveLimit);
+        float yMovement = UnityEngine.Random.Range(-m_yMoveLimit, 0);
         moveVector.x = xMovement;
-        moveVector.y = yMovement;
-
-        Debug.Log("Move vector: " + moveVector);
+        moveVector.y = yMovement;   
 
         rb.velocity = moveVector;
         // rb.AddTorque(360.0f); Rotate object somehow
