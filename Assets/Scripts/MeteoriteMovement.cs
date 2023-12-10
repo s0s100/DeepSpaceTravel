@@ -6,13 +6,9 @@ using UnityEngine;
 
 public class MeteoriteMovement : MonoBehaviour
 {
-    [SerializeField]
     private float maxRotationSpeed = 10.0f;
-
-    [SerializeField]
-    private float movementSpeed = 5.0f;
-
-    [SerializeField]
+    private float xMoveLimit = 1.0f;
+    private float yMoveLimit = 3.0f;
     private float deletionTime = 10.0f;
 
     Rigidbody2D rb;
@@ -35,11 +31,16 @@ public class MeteoriteMovement : MonoBehaviour
 
     private void DefaultForceSetup()
     {
-        Vector2 moveVector = Vector2.down * movementSpeed;
-        float yMovement = UnityEngine.Random.Range(-movementSpeed, movementSpeed);
-        moveVector += Vector2.right * yMovement;
+        Vector2 moveVector = new();
 
-        rb.AddForce(moveVector);
+        float xMovement = UnityEngine.Random.Range(-xMoveLimit, xMoveLimit);
+        float yMovement = UnityEngine.Random.Range(-yMoveLimit, 0);
+        moveVector.x = xMovement;
+        moveVector.y = yMovement;
+
+        Debug.Log("Move vector: " + moveVector);
+
+        rb.velocity = moveVector;
         // rb.AddTorque(360.0f); Rotate object somehow
     }
 
@@ -50,5 +51,17 @@ public class MeteoriteMovement : MonoBehaviour
     private void OnDestroy()
     {
         m_movementSubscription.Dispose();
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.tag == "Player")
+            Debug.Log("Entered");
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "Player")
+            Debug.Log("Triggered");
     }
 }

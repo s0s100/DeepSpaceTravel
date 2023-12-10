@@ -30,6 +30,8 @@ public class GenerationPattern : ScriptableObject
 
     public void Initialize(Transform parentObject)
     {
+        this.parentObject = parentObject;
+
         Observable.Timer(TimeSpan.FromSeconds(timeBeforeGeneration)).Subscribe(_ =>
             {
                 GenerationIteration();

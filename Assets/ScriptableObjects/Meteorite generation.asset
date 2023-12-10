@@ -18,6 +18,6 @@ MonoBehaviour:
   - {fileID: 2074758602364643871, guid: b172132b2e7482d4fa8ba8f16e3a58de, type: 3}
   generationTime: 1
   generationRandomTime: 2
-  timeBeforeGeneration: 5
+  timeBeforeGeneration: 0
   minGenerationNum: 1
   maxGenerationNum: 3
