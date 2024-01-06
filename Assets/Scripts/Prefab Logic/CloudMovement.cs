@@ -29,6 +29,6 @@ public class CloudMovement : MonoBehaviour
 
     private void OnDestroy()
     {
-        m_movementSubscription.Dispose();   
+        m_movementSubscription?.Dispose();
     }
 }

@@ -5,9 +5,9 @@ using UniRx.Triggers;
 
 public class TouchInputManager : MonoBehaviour
 {
-    private Subject<Vector2> touchStartSubject = new Subject<Vector2>();
-    private Subject<Vector2> touchMoveSubject = new Subject<Vector2>();
-    private Subject<Vector2> touchEndSubject = new Subject<Vector2>();
+    private readonly Subject<Vector2> touchStartSubject = new();
+    private readonly Subject<Vector2> touchMoveSubject = new();
+    private readonly Subject<Vector2> touchEndSubject = new();
 
     public IObservable<Vector2> OnTouchStart => touchStartSubject;
     public IObservable<Vector2> OnTouchMove => touchMoveSubject;

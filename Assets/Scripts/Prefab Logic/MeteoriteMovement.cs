@@ -36,7 +36,7 @@ public class MeteoriteMovement : MonoBehaviour
         float xMovement = UnityEngine.Random.Range(-m_xMoveLimit, m_xMoveLimit);
         float yMovement = UnityEngine.Random.Range(-m_yMoveLimit, 0);
         moveVector.x = xMovement;
-        moveVector.y = yMovement;   
+        moveVector.y = yMovement;
 
         rb.velocity = moveVector;
         // rb.AddTorque(360.0f); Rotate object somehow
@@ -44,10 +44,11 @@ public class MeteoriteMovement : MonoBehaviour
 
     private void PeriodicMovement()
     {
+
     }
 
     private void OnDestroy()
     {
-        m_movementSubscription.Dispose();
+        m_movementSubscription?.Dispose();
     }
 }

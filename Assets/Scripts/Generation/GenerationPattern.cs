@@ -84,7 +84,7 @@ public class GenerationPattern : ScriptableObject
         float randomXPos = UnityEngine.Random.Range(minXPos, maxXPos);
 
         float yPos = ScreenInfo.GetMaxYPos() + SCREEN_TOP_SHIFT;
-        
+
         location.x = randomXPos;
         location.y = yPos;
 

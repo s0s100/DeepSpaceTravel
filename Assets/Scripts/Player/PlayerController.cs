@@ -60,7 +60,7 @@ namespace Player
 
         private void OnDestroy()
         {
-            m_movementSubscription.Dispose();
+            m_movementSubscription?.Dispose();
         }
 
         private void SubscribeToMovement()
@@ -125,7 +125,7 @@ namespace Player
                 return 1.0f;
             else if (m_moveTouchPos.x < comparePosition.x - minTouchDistance)
                 return -1.0f;
-            
+
             return 0.0f;
         }
 
@@ -137,9 +137,9 @@ namespace Player
 
             float movement = moveDirection * Time.deltaTime * m_playerData.Speed;
             Vector3 moveVector = movement * Vector2.right;
-            Vector2 newLocation = transform.position + moveVector; 
+            Vector2 newLocation = transform.position + moveVector;
 
-            if (CanMove(newLocation)) 
+            if (CanMove(newLocation))
                 transform.Translate(moveVector);
         }
 
@@ -177,9 +177,9 @@ namespace Player
         private void ImprovedMovementSetup()
         {
             // Caclulate default constunts
-            k1 = c / (float) (Math.PI * f);
-            k2 = 1f / (float) Math.Pow(2f * Math.PI * f, 2);    
-            k3 = (r * c) / (float) (2 * Math.PI * f);
+            k1 = c / (float)(Math.PI * f);
+            k2 = 1f / (float)Math.Pow(2f * Math.PI * f, 2);
+            k3 = (r * c) / (float)(2 * Math.PI * f);
 
             yPos = transform.position.x;
             yVel = 0.0f;
