@@ -281,10 +281,10 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 834686708}
-  - component: {fileID: 834686707}
   - component: {fileID: 834686709}
   - component: {fileID: 834686710}
   - component: {fileID: 834686711}
+  - component: {fileID: 834686707}
   - component: {fileID: 834686712}
   - component: {fileID: 834686713}
   m_Layer: 0
@@ -386,11 +386,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cf6bbc320e6857f4f82afb57ff236a5c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  minTouchDistance: 0.05
-  movementType: 0
-  f: 1.5
-  c: 0.4
-  r: 1.5
 --- !u!114 &834686711
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -932,9 +927,9 @@ MonoBehaviour:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
-  - {fileID: 1645278001}
-  - {fileID: 834686708}
-  - {fileID: 206292244}
-  - {fileID: 1641785464}
-  - {fileID: 800541027}
   - {fileID: 1704707896}
+  - {fileID: 206292244}
+  - {fileID: 1645278001}
+  - {fileID: 800541027}
+  - {fileID: 1641785464}
+  - {fileID: 834686708}

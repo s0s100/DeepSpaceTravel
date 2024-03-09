@@ -18,9 +18,6 @@ namespace Core.Player
     {
         [Inject] private readonly ConfigData _config;
 
-        [Header("Input type config")]
-        [SerializeField] private MovementType movementType = MovementType.GlobalMovement;
-
         // Used to simplify control type with lambda function
         private readonly Dictionary<MovementType, Action> actionDictionary = new();
 
@@ -33,19 +30,14 @@ namespace Core.Player
         private Vector2 _startTouchPos = Vector2.zero;
         private Vector2 _startPlayerPosition = Vector2.zero;
 
-        // Move to config files as well
-        // Physics movement
-        [SerializeField]
-        private float f = 0.5f, c = 0.15f, r = 2f;
         private float k1, k2, k3;
         private float xSpeed;
         private float yPos, yVel, yAcc;
 
-
         private void PopulateActionDictionary()
         {
-            actionDictionary[MovementType.HorizontalMovement] = () => AdvancedHorizontalMovement();
-            actionDictionary[MovementType.GlobalMovement] = () => Advanced2DMovement();
+            actionDictionary[MovementType.HorizontalMovement] = () => HorizontalMovement();
+            actionDictionary[MovementType.GlobalMovement] = () => GlobalMovement();
         }
 
         private void Awake()
@@ -53,7 +45,7 @@ namespace Core.Player
             _rigidbody = GetComponent<Rigidbody2D>();
             _playerData = GetComponent<PlayerData>();
             PopulateActionDictionary();
-            ImprovedMovementSetup();
+            MovementSetup();
         }
 
         private void Start()
@@ -71,6 +63,7 @@ namespace Core.Player
         {
             _movementSubscription?.Dispose();
 
+            var movementType = _config.control.movementType;
             var moveAction = actionDictionary[movementType];
             _movementSubscription = Observable
                     .EveryUpdate()
@@ -82,6 +75,7 @@ namespace Core.Player
 
         private void SubscribeToTouchInputManager()
         {
+            // Get rid of FindObjectOfType method, use injection instead
             var touchInputManager = FindObjectOfType<TouchInputManager>();
 
             touchInputManager.OnTouchStart.Subscribe(touchPosition =>
@@ -134,8 +128,12 @@ namespace Core.Player
             return 0.0f;
         }
 
-        private void ImprovedMovementSetup()
+        private void MovementSetup()
         {
+            var f = _config.control.fCoefficient;
+            var c = _config.control.cCoefficient;
+            var r = _config.control.rCoefficient;
+
             // Caclulate default constunts
             k1 = c / (float)(Math.PI * f);
             k2 = 1f / (float)Math.Pow(2f * Math.PI * f, 2);
@@ -147,7 +145,7 @@ namespace Core.Player
         }
 
         // X Refers to basic limited movement while Y to improved movement
-        private void AdvancedHorizontalMovement()
+        private void HorizontalMovement()
         {
             float xDirection = CalculateHorizontalDirection(_moveTouchPos);
             if (xDirection != 0.0f)
@@ -168,7 +166,8 @@ namespace Core.Player
             }
         }
 
-        private void Advanced2DMovement()
+        // To implement
+        private void GlobalMovement()
         {
 
         }

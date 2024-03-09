@@ -15,3 +15,7 @@ MonoBehaviour:
   data:
     control:
       minTouchDistance: 0.1
+      movementType: 0
+      fCoefficient: 1.5
+      cCoefficient: 0.5
+      rCoefficient: 1.5
