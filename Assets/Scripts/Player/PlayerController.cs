@@ -2,6 +2,8 @@ using UnityEngine;
 using UniRx;
 using System;
 using System.Collections.Generic;
+using Zenject;
+using Config;
 
 namespace Player
 {
@@ -13,9 +15,11 @@ namespace Player
 
     public class PlayerController : MonoBehaviour
     {
+        [Inject] private readonly ConfigData _config;
+
         // Move to config file
-        [Header("Input sensitivity config")]
-        [SerializeField] private float minTouchDistance = 0.1f;
+        //[Header("Input sensitivity config")]
+        //[SerializeField] private float minTouchDistance = 0.1f;
 
         [Header("Input type config")]
         [SerializeField] private MovementType movementType = MovementType.GlobalMovement;
@@ -123,6 +127,8 @@ namespace Player
 
         private float CalculateHorizontalDirection(Vector2 comparePosition)
         {
+            var minTouchDistance = _config.control.minTouchDistance;
+
             if (_moveTouchPos.x > comparePosition.x + minTouchDistance)
                 return 1.0f;
             else if (_moveTouchPos.x < comparePosition.x - minTouchDistance)
