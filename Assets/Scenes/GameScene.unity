@@ -387,7 +387,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   minTouchDistance: 0.05
-  movementType: 3
+  movementType: 0
   f: 1.5
   c: 0.4
   r: 1.5
