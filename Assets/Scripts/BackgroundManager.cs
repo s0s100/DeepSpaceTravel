@@ -4,8 +4,8 @@ using System;
 
 public class BackgroundManager : MonoBehaviour
 {
-    private const float CLOUD_SIZE_INCREASEMENT = 5.0f;
-    private const float DEFAULT_GENERATED_SHIFT = 2.0f;
+    private const float CloudSizeResize = 5.0f;
+    private const float DefaultGenerationShift = 2.0f;
 
     [SerializeField] private float foregroundGenerationTime = 2.0f;
     [SerializeField] private float foregroundExistanceTime = 10.0f;
@@ -39,7 +39,7 @@ public class BackgroundManager : MonoBehaviour
 
         foregroundObject.transform.parent = transform;
         foregroundObject.transform.position = Vector2.zero;
-        foregroundObject.transform.localScale *= CLOUD_SIZE_INCREASEMENT;
+        foregroundObject.transform.localScale *= CloudSizeResize;
         foregroundObject.transform.position = GetRandomTopPosition();
 
         foregroundRenderer.sprite = RandomForegroundSprite();
@@ -61,7 +61,7 @@ public class BackgroundManager : MonoBehaviour
         float maxXValue = ScreenInfo.GetMaxXPos();
         float maxYValue = ScreenInfo.GetMaxYPos();
 
-        maxYValue += DEFAULT_GENERATED_SHIFT;
+        maxYValue += DefaultGenerationShift;
         float randomXPos = UnityEngine.Random.Range(minXValue, maxXValue);
         Vector2 randomPos = new(randomXPos, maxYValue);
 

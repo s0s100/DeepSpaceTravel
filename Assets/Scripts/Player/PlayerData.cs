@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 namespace Player
 {
@@ -28,6 +29,13 @@ namespace Player
         private void Death()
         {
             Debug.Log("The game is over!");
+            RestartGame();
+        }
+
+        private void RestartGame()
+        {
+            var curSceneIndex = SceneManager.GetActiveScene().buildIndex;
+            SceneManager.LoadScene(curSceneIndex);
         }
 
         // Uses player box collider to define player object boundaries

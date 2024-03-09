@@ -26,11 +26,11 @@ public class GenerationPattern : ScriptableObject
     [SerializeField]
     private int maxGenerationNum;
 
-    private Transform parentObject;
+    private Transform _parentObject;
 
     public void Initialize(Transform parentObject)
     {
-        this.parentObject = parentObject;
+        _parentObject = parentObject;
 
         Observable.Timer(TimeSpan.FromSeconds(timeBeforeGeneration)).Subscribe(_ =>
             {
@@ -53,7 +53,7 @@ public class GenerationPattern : ScriptableObject
 
     private void GenerateObjects()
     {
-        int randomValue = UnityEngine.Random.Range(minGenerationNum, maxGenerationNum + 1);
+        //var randomValue = UnityEngine.Random.Range(minGenerationNum, maxGenerationNum + 1);
         for (int i = 0; i < generationObjects.Length; i++)
         {
             GenerateObject();
@@ -72,7 +72,7 @@ public class GenerationPattern : ScriptableObject
         int randomValue = UnityEngine.Random.Range(0, maxNumOfObject);
         Vector2 location = DefineGenerationLocation();
         GameObject newObject = Instantiate(generationObjects[randomValue], location, Quaternion.identity);
-        newObject.transform.parent = parentObject;
+        newObject.transform.parent = _parentObject;
     }
 
     private Vector2 DefineGenerationLocation()

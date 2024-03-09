@@ -1,6 +1,6 @@
 using UnityEngine;
 
-// Class to retreive screen information such as width, height and so on
+// Class to retreive screen information such as width, height, etc.
 public static class ScreenInfo
 {
     private static float maxXPos = 0.0f;
