@@ -4,8 +4,9 @@ using System;
 using System.Collections.Generic;
 using Zenject;
 using Config;
+using Controls;
 
-namespace Player
+namespace Core.Player
 {
     public enum MovementType
     {
@@ -16,10 +17,6 @@ namespace Player
     public class PlayerController : MonoBehaviour
     {
         [Inject] private readonly ConfigData _config;
-
-        // Move to config file
-        //[Header("Input sensitivity config")]
-        //[SerializeField] private float minTouchDistance = 0.1f;
 
         [Header("Input type config")]
         [SerializeField] private MovementType movementType = MovementType.GlobalMovement;

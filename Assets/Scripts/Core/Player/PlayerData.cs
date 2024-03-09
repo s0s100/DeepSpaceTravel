@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-namespace Player
+namespace Core.Player
 {
     // Class which stores player object data and stores/calculates required data
     public class PlayerData : MonoBehaviour
