@@ -3,7 +3,6 @@ using UnityEngine.SceneManagement;
 
 namespace Core.Player
 {
-    // Class which stores player object data and stores/calculates required data
     public class PlayerData : MonoBehaviour
     {
         [SerializeField] private int curHealth = 1;
@@ -38,13 +37,13 @@ namespace Core.Player
             SceneManager.LoadScene(curSceneIndex);
         }
 
-        // Uses player box collider to define player object boundaries
-        public float CalculateXSize()
+        public Vector2 PlayerModelSize()
         {
             if (TryGetComponent<BoxCollider2D>(out var collider))
-                return collider.size.x * transform.localScale.x;
+                return collider.size * transform.localScale;
 
-            return 0.0f;
+            Debug.LogError("Unable to find player size");
+            return Vector2.zero;
         }
     }
 }

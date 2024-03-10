@@ -19,7 +19,7 @@ namespace Core.Player
         [Inject] private readonly ConfigData _config;
 
         // Used to simplify control type with lambda function
-        private readonly Dictionary<MovementType, Action> actionDictionary = new();
+        private readonly Dictionary<MovementType, Action> _actionDictionary = new();
 
         // Movement subscription
         private IDisposable _movementSubscription;
@@ -30,14 +30,14 @@ namespace Core.Player
         private Vector2 _startTouchPos = Vector2.zero;
         private Vector2 _startPlayerPosition = Vector2.zero;
 
+        private Vector2 movementSpeed = Vector2.zero;
         private float k1, k2, k3;
-        private float xSpeed;
         private float yPos, yVel, yAcc;
 
         private void PopulateActionDictionary()
         {
-            actionDictionary[MovementType.HorizontalMovement] = () => HorizontalMovement();
-            actionDictionary[MovementType.GlobalMovement] = () => GlobalMovement();
+            _actionDictionary[MovementType.HorizontalMovement] = () => HorizontalMovement();
+            _actionDictionary[MovementType.GlobalMovement] = () => GlobalMovement();
         }
 
         private void Awake()
@@ -64,7 +64,7 @@ namespace Core.Player
             _movementSubscription?.Dispose();
 
             var movementType = _config.control.movementType;
-            var moveAction = actionDictionary[movementType];
+            var moveAction = _actionDictionary[movementType];
             _movementSubscription = Observable
                     .EveryUpdate()
                     .Subscribe(_ =>
@@ -96,17 +96,22 @@ namespace Core.Player
             });
         }
 
+        // TODO: Improve, maybe move to PlayerData
         private bool CanMove(Vector2 newPosition)
         {
             // Divided by 2 to have a bounary between screen and the right side of the screen equal to 2
-            float playerXBoundary = _playerData.CalculateXSize() / 2;
-            float maxXScreenPos = ScreenInfo.GetMaxXPos();
-            float minXScreenPos = ScreenInfo.GetMinXPos();
+            var playerBorders = _playerData.PlayerModelSize() / 2;
+            var maxXScreenPos = ScreenInfo.GetMaxXPos();
+            var minXScreenPos = ScreenInfo.GetMinXPos();
+            var maxYScreenPos = ScreenInfo.GetMaxYPos();
+            var minYScreenPos = ScreenInfo.GetMinYPos();
 
-            bool canMoveLeft = (minXScreenPos + playerXBoundary < newPosition.x);
-            bool canMoveRight = (maxXScreenPos - playerXBoundary > newPosition.x);
+            bool canMoveLeft = (minXScreenPos + playerBorders.x < newPosition.x);
+            bool canMoveRight = (maxXScreenPos - playerBorders.x > newPosition.x);
+            bool canMoveDown = (minYScreenPos + playerBorders.y < newPosition.y);
+            bool canMoveUp = (maxYScreenPos - playerBorders.y > newPosition.y);
 
-            return canMoveLeft && canMoveRight;
+            return canMoveLeft && canMoveRight & canMoveDown & canMoveUp;
         }
 
         private void StopMovement()
@@ -116,16 +121,22 @@ namespace Core.Player
             _startPlayerPosition = transform.position;
         }
 
-        private float CalculateHorizontalDirection(Vector2 comparePosition)
+        private Vector2 CalculateDirection(Vector2 comparePosition)
         {
             var minTouchDistance = _config.control.minTouchDistance;
+            var direction = Vector2.zero;
 
             if (_moveTouchPos.x > comparePosition.x + minTouchDistance)
-                return 1.0f;
+                direction.x = 1.0f;
             else if (_moveTouchPos.x < comparePosition.x - minTouchDistance)
-                return -1.0f;
+                direction.x = -1.0f;
 
-            return 0.0f;
+            if (_moveTouchPos.y > comparePosition.y + minTouchDistance) 
+                direction.y = 1.0f;
+            else if(_moveTouchPos.y < comparePosition.y + minTouchDistance)
+                direction.y = -1.0f;
+
+            return direction;
         }
 
         private void MovementSetup()
@@ -144,21 +155,17 @@ namespace Core.Player
             yAcc = 0.0f;
         }
 
-        // X Refers to basic limited movement while Y to improved movement
         private void HorizontalMovement()
         {
-            float xDirection = CalculateHorizontalDirection(_moveTouchPos);
-            if (xDirection != 0.0f)
-                xSpeed = xDirection * _playerData.Speed;
-            else
-                xSpeed = 0.0f;
+            var movementDirection = CalculateDirection(_moveTouchPos);
+            movementSpeed.x = movementDirection.x * _playerData.Speed;
 
             yPos += yVel * Time.deltaTime;
-            yAcc = (_moveTouchPos.x + k3 * xSpeed - yPos - k1 * yVel) / k2;
+            yAcc = (_moveTouchPos.x + k3 * movementSpeed.x - yPos - k1 * yVel) / k2;
             yVel += yAcc * Time.deltaTime;
 
-            Vector3 moveVector = (yPos - transform.position.x) * Vector3.right;
-            Vector2 newLocation = transform.position + moveVector;
+            var moveVector = (yPos - transform.position.x) * Vector3.right;
+            var newLocation = transform.position + moveVector;
 
             if (CanMove(newLocation))
             {
