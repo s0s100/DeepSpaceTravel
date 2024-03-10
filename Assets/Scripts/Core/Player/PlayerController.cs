@@ -31,8 +31,8 @@ namespace Core.Player
         private Vector2 _startPlayerPosition = Vector2.zero;
 
         private Vector2 movementSpeed = Vector2.zero;
+        private Vector2 calculatedPos, calculatedVel, calculatedAcc;
         private float k1, k2, k3;
-        private float yPos, yVel, yAcc;
 
         private void PopulateActionDictionary()
         {
@@ -71,6 +71,11 @@ namespace Core.Player
                     {
                         moveAction();
                     });
+
+            if (movementType == MovementType.HorizontalMovement)
+            {
+                _rigidbody.constraints = RigidbodyConstraints2D.FreezePositionY;
+            }
         }
 
         private void SubscribeToTouchInputManager()
@@ -96,7 +101,7 @@ namespace Core.Player
             });
         }
 
-        // TODO: Improve, maybe move to PlayerData
+        // TODO: Improve / Move to PlayerData / Remove (Choose one)
         private bool CanMove(Vector2 newPosition)
         {
             // Divided by 2 to have a bounary between screen and the right side of the screen equal to 2
@@ -131,9 +136,9 @@ namespace Core.Player
             else if (_moveTouchPos.x < comparePosition.x - minTouchDistance)
                 direction.x = -1.0f;
 
-            if (_moveTouchPos.y > comparePosition.y + minTouchDistance) 
+            if (_moveTouchPos.y > comparePosition.y + minTouchDistance)
                 direction.y = 1.0f;
-            else if(_moveTouchPos.y < comparePosition.y + minTouchDistance)
+            else if (_moveTouchPos.y < comparePosition.y + minTouchDistance)
                 direction.y = -1.0f;
 
             return direction;
@@ -150,9 +155,9 @@ namespace Core.Player
             k2 = 1f / (float)Math.Pow(2f * Math.PI * f, 2);
             k3 = (r * c) / (float)(2 * Math.PI * f);
 
-            yPos = transform.position.x;
-            yVel = 0.0f;
-            yAcc = 0.0f;
+            calculatedPos = transform.position;
+            calculatedVel = Vector2.zero;
+            calculatedAcc = Vector2.zero;
         }
 
         private void HorizontalMovement()
@@ -160,11 +165,11 @@ namespace Core.Player
             var movementDirection = CalculateDirection(_moveTouchPos);
             movementSpeed.x = movementDirection.x * _playerData.Speed;
 
-            yPos += yVel * Time.deltaTime;
-            yAcc = (_moveTouchPos.x + k3 * movementSpeed.x - yPos - k1 * yVel) / k2;
-            yVel += yAcc * Time.deltaTime;
+            calculatedPos += calculatedVel * Time.deltaTime;
+            calculatedAcc.x = (_moveTouchPos.x + k3 * movementSpeed.x - calculatedPos.x - k1 * calculatedVel.x) / k2;
+            calculatedVel += calculatedAcc * Time.deltaTime;
 
-            var moveVector = (yPos - transform.position.x) * Vector3.right;
+            var moveVector = (calculatedPos.x - transform.position.x) * Vector3.right;
             var newLocation = transform.position + moveVector;
 
             if (CanMove(newLocation))
@@ -176,7 +181,20 @@ namespace Core.Player
         // To implement
         private void GlobalMovement()
         {
+            var movementDirection = CalculateDirection(_moveTouchPos);
+            movementSpeed = movementDirection * _playerData.Speed;
 
+            calculatedPos += calculatedVel * Time.deltaTime;
+            calculatedAcc = (_moveTouchPos + k3 * movementSpeed - calculatedPos - k1 * calculatedVel) / k2;
+            calculatedVel += calculatedAcc * Time.deltaTime;
+
+            var moveVector = calculatedPos - (Vector2)transform.position;
+            var newLocation = (Vector2)transform.position + moveVector;
+
+            if (CanMove(newLocation))
+            {
+                _rigidbody.MovePosition(newLocation);
+            }
         }
     }
 }
