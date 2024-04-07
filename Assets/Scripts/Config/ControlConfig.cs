@@ -1,6 +1,5 @@
 using Core.Player;
 using System;
-using UnityEngine;
 
 namespace Config
 {

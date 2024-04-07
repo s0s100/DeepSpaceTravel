@@ -75,6 +75,7 @@ namespace Core.Player
             if (movementType == MovementType.HorizontalMovement)
             {
                 _rigidbody.constraints = RigidbodyConstraints2D.FreezePositionY;
+                _rigidbody.freezeRotation = true;
             }
         }
 
@@ -169,8 +170,9 @@ namespace Core.Player
             calculatedAcc.x = (_moveTouchPos.x + k3 * movementSpeed.x - calculatedPos.x - k1 * calculatedVel.x) / k2;
             calculatedVel += calculatedAcc * Time.deltaTime;
 
-            var moveVector = (calculatedPos.x - transform.position.x) * Vector3.right;
-            var newLocation = transform.position + moveVector;
+            var moveVector = (calculatedPos.x - transform.position.x) * Vector2.right;
+            moveVector *= _playerData.Speed;
+            var newLocation = (Vector2)transform.position + moveVector;
 
             if (CanMove(newLocation))
             {
@@ -189,6 +191,7 @@ namespace Core.Player
             calculatedVel += calculatedAcc * Time.deltaTime;
 
             var moveVector = calculatedPos - (Vector2)transform.position;
+            moveVector *= _playerData.Speed;
             var newLocation = (Vector2)transform.position + moveVector;
 
             if (CanMove(newLocation))
