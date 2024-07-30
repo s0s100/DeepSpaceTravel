@@ -1,32 +1,23 @@
+using Config;
 using System;
 using UniRx;
 using UnityEngine;
+using Zenject;
 
 namespace Core
 {
     [CreateAssetMenu(fileName = "Generation pattern", menuName = "ScriptableObjects/Generation pattern", order = 1)]
     public class GenerationPattern : ScriptableObject
     {
-        private const float SCREEN_TOP_SHIFT = 2.0f;
+        [Inject] private readonly ConfigData _config;
 
-        // Which objects might generate
-        [SerializeField]
-        private GameObject[] generationObjects;
-
-        [SerializeField]
-        private float generationTime;
-        // Adds random value to generation time
-        [SerializeField]
-        private float generationRandomTime;
-        // Time before generation start
-        [SerializeField]
-        private float timeBeforeGeneration;
-
+        [SerializeField] private GameObject[] generationObjects;
+        [SerializeField] private float generationTime;
+        [SerializeField] private float generationRandomTime;
+        [SerializeField] private float timeBeforeGeneration;
         // How many objects will spawn at the same time
-        [SerializeField]
-        private int minGenerationNum;
-        [SerializeField]
-        private int maxGenerationNum;
+        [SerializeField] private int minGenerationNum;
+        [SerializeField] private int maxGenerationNum;
 
         private Transform _parentObject;
 
@@ -85,7 +76,7 @@ namespace Core
             float maxXPos = ScreenInfo.GetMaxXPos();
             float randomXPos = UnityEngine.Random.Range(minXPos, maxXPos);
 
-            float yPos = ScreenInfo.GetMaxYPos() + SCREEN_TOP_SHIFT;
+            float yPos = ScreenInfo.GetMaxYPos() + _config.GenerationConfig.screenSpawnShift;
 
             location.x = randomXPos;
             location.y = yPos;

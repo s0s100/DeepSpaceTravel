@@ -7,5 +7,6 @@ namespace Config
     {
         public PlayerControlConfig PlayerControlConfig;
         public BackgroundConfig BackgroundConfig;
+        public GenerationConfig GenerationConfig;
     }
 }

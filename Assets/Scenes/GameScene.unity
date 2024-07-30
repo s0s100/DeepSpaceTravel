@@ -168,14 +168,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 837e7f3bf4d73cf44b088da249e5ff40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  foregroundGenerationTime: 2
-  foregroundExistanceTime: 10
-  foregroundMovementSpeed: 2
-  backgroundSprite: {fileID: 21300000, guid: 5dcd6e99c5f37d14b82a43adb1122981, type: 3}
-  foregroundSprites:
-  - {fileID: 21300000, guid: 8456e7faa29c2ff47aa23fff6b42d306, type: 3}
-  - {fileID: 21300000, guid: 9e53e92058595eb4aab066afa4a1c097, type: 3}
-  - {fileID: 21300000, guid: 8d1e2a2079918f54d9fd12b685413fb5, type: 3}
 --- !u!114 &206292246
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -201,7 +193,7 @@ GameObject:
   - component: {fileID: 800541027}
   - component: {fileID: 800541026}
   m_Layer: 0
-  m_Name: Global 2D Light
+  m_Name: Global 2DLight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -928,8 +920,8 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1704707896}
+  - {fileID: 1641785464}
   - {fileID: 206292244}
   - {fileID: 1645278001}
   - {fileID: 800541027}
-  - {fileID: 1641785464}
   - {fileID: 834686708}

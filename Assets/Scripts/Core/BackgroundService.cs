@@ -8,18 +8,9 @@ namespace Core
 {
     public class BackgroundService : MonoBehaviour
     {
-        [Inject] private readonly ConfigData _configData;
-        //private const float CloudSizeResize = 5.0f;
-        //private const float DefaultGenerationShift = 2.0f;
+        [Inject] private readonly ConfigData _config;
 
-        //[SerializeField] private float foregroundGenerationTime = 2.0f;
-        //[SerializeField] private float foregroundExistanceTime = 10.0f;
-        //[SerializeField] private float foregroundMovementSpeed = 1.0f;
-
-        //[SerializeField] private Sprite backgroundSprite;
-        //[SerializeField] private Sprite[] foregroundSprites;
-
-        IDisposable cloudSubsctiption;
+        private IDisposable _cloudSubsctiption;
 
         private void Start()
         {
@@ -29,8 +20,8 @@ namespace Core
 
         private void PeriodicallyGenerateClouds()
         {
-            var timer = Observable.Interval(TimeSpan.FromSeconds(_configData.BackgroundConfig.foregroundGenerationTime));
-            cloudSubsctiption = timer.Subscribe(_ =>
+            var timer = Observable.Interval(TimeSpan.FromSeconds(_config.BackgroundConfig.foregroundGenerationTime));
+            _cloudSubsctiption = timer.Subscribe(_ =>
             {
                 GenerateCloud();
             });
@@ -44,20 +35,20 @@ namespace Core
 
             foregroundObject.transform.parent = transform;
             foregroundObject.transform.position = Vector2.zero;
-            foregroundObject.transform.localScale *= _configData.BackgroundConfig.cloudSizeResize;
+            foregroundObject.transform.localScale *= _config.BackgroundConfig.cloudSizeResize;
             foregroundObject.transform.position = GetRandomTopPosition();
 
             foregroundRenderer.sprite = RandomForegroundSprite();
             foregroundRenderer.sortingLayerName = "Foreground";
 
-            cloudMovement.MovementSpeed = _configData.BackgroundConfig.foregroundMovementSpeed;
-            cloudMovement.DeletionTime = _configData.BackgroundConfig.foregroundExistanceTime;
+            cloudMovement.MovementSpeed = _config.BackgroundConfig.foregroundMovementSpeed;
+            cloudMovement.DeletionTime = _config.BackgroundConfig.foregroundExistanceTime;
         }
 
         private Sprite RandomForegroundSprite()
         {
-            int randomNum = UnityEngine.Random.Range(0, _configData.BackgroundConfig.foregroundSprites.Length);
-            return _configData.BackgroundConfig.foregroundSprites[randomNum];
+            int randomNum = UnityEngine.Random.Range(0, _config.BackgroundConfig.foregroundSprites.Length);
+            return _config.BackgroundConfig.foregroundSprites[randomNum];
         }
 
         private Vector2 GetRandomTopPosition()
@@ -66,7 +57,7 @@ namespace Core
             float maxXValue = ScreenInfo.GetMaxXPos();
             float maxYValue = ScreenInfo.GetMaxYPos();
 
-            maxYValue += _configData.BackgroundConfig.defaultGenerationShift;
+            maxYValue += _config.BackgroundConfig.defaultGenerationShift;
             float randomXPos = UnityEngine.Random.Range(minXValue, maxXValue);
             Vector2 randomPos = new(randomXPos, maxYValue);
 
@@ -80,7 +71,7 @@ namespace Core
 
             backgroundObject.transform.parent = transform;
 
-            backgroundRenderer.sprite = _configData.BackgroundConfig.backgroundSprite;
+            backgroundRenderer.sprite = _config.BackgroundConfig.backgroundSprite;
             backgroundRenderer.sortingLayerName = "Background";
 
             float spriteScale = ScreenInfo.GetFullScreenScale(backgroundRenderer.sprite);
@@ -89,7 +80,7 @@ namespace Core
 
         private void OnDestroy()
         {
-            cloudSubsctiption.Dispose();
+            _cloudSubsctiption.Dispose();
         }
     }
 }
