@@ -4,7 +4,7 @@ using System;
 namespace Config
 {
     [Serializable]
-    public struct ControlConfig
+    public struct PlayerControlConfig
     {
         public float minTouchDistance;
         public MovementType movementType;

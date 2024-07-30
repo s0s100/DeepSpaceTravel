@@ -1,20 +1,23 @@
 using UnityEngine;
 using UniRx;
 using System;
+using Zenject;
+using Config;
 
 namespace Core
 {
     public class BackgroundService : MonoBehaviour
     {
-        private const float CloudSizeResize = 5.0f;
-        private const float DefaultGenerationShift = 2.0f;
+        [Inject] private readonly ConfigData _configData;
+        //private const float CloudSizeResize = 5.0f;
+        //private const float DefaultGenerationShift = 2.0f;
 
-        [SerializeField] private float foregroundGenerationTime = 2.0f;
-        [SerializeField] private float foregroundExistanceTime = 10.0f;
-        [SerializeField] private float foregroundMovementSpeed = 1.0f;
+        //[SerializeField] private float foregroundGenerationTime = 2.0f;
+        //[SerializeField] private float foregroundExistanceTime = 10.0f;
+        //[SerializeField] private float foregroundMovementSpeed = 1.0f;
 
-        [SerializeField] private Sprite backgroundSprite;
-        [SerializeField] private Sprite[] foregroundSprites;
+        //[SerializeField] private Sprite backgroundSprite;
+        //[SerializeField] private Sprite[] foregroundSprites;
 
         IDisposable cloudSubsctiption;
 
@@ -26,7 +29,7 @@ namespace Core
 
         private void PeriodicallyGenerateClouds()
         {
-            var timer = Observable.Interval(TimeSpan.FromSeconds(foregroundGenerationTime));
+            var timer = Observable.Interval(TimeSpan.FromSeconds(_configData.BackgroundConfig.foregroundGenerationTime));
             cloudSubsctiption = timer.Subscribe(_ =>
             {
                 GenerateCloud();
@@ -41,20 +44,20 @@ namespace Core
 
             foregroundObject.transform.parent = transform;
             foregroundObject.transform.position = Vector2.zero;
-            foregroundObject.transform.localScale *= CloudSizeResize;
+            foregroundObject.transform.localScale *= _configData.BackgroundConfig.cloudSizeResize;
             foregroundObject.transform.position = GetRandomTopPosition();
 
             foregroundRenderer.sprite = RandomForegroundSprite();
             foregroundRenderer.sortingLayerName = "Foreground";
 
-            cloudMovement.MovementSpeed = foregroundMovementSpeed;
-            cloudMovement.DeletionTime = foregroundExistanceTime;
+            cloudMovement.MovementSpeed = _configData.BackgroundConfig.foregroundMovementSpeed;
+            cloudMovement.DeletionTime = _configData.BackgroundConfig.foregroundExistanceTime;
         }
 
         private Sprite RandomForegroundSprite()
         {
-            int randomNum = UnityEngine.Random.Range(0, foregroundSprites.Length);
-            return foregroundSprites[randomNum];
+            int randomNum = UnityEngine.Random.Range(0, _configData.BackgroundConfig.foregroundSprites.Length);
+            return _configData.BackgroundConfig.foregroundSprites[randomNum];
         }
 
         private Vector2 GetRandomTopPosition()
@@ -63,7 +66,7 @@ namespace Core
             float maxXValue = ScreenInfo.GetMaxXPos();
             float maxYValue = ScreenInfo.GetMaxYPos();
 
-            maxYValue += DefaultGenerationShift;
+            maxYValue += _configData.BackgroundConfig.defaultGenerationShift;
             float randomXPos = UnityEngine.Random.Range(minXValue, maxXValue);
             Vector2 randomPos = new(randomXPos, maxYValue);
 
@@ -77,7 +80,7 @@ namespace Core
 
             backgroundObject.transform.parent = transform;
 
-            backgroundRenderer.sprite = backgroundSprite;
+            backgroundRenderer.sprite = _configData.BackgroundConfig.backgroundSprite;
             backgroundRenderer.sortingLayerName = "Background";
 
             float spriteScale = ScreenInfo.GetFullScreenScale(backgroundRenderer.sprite);

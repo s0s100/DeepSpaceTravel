@@ -9,13 +9,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a54c89a30bc39b0488a558836247aa55, type: 3}
+  m_Script: {fileID: 11500000, guid: 3388b5594a54dd44183657794eef74ad, type: 3}
   m_Name: Config
   m_EditorClassIdentifier: 
   data:
-    control:
+    PlayerControlConfig:
       minTouchDistance: 0.1
-      movementType: 1
+      movementType: 0
       fCoefficient: 1.5
       cCoefficient: 0.5
       rCoefficient: 1.5
+    BackgroundConfig:
+      cloudSizeResize: 5
+      defaultGenerationShift: 2
+      foregroundGenerationTime: 2
+      foregroundExistanceTime: 10
+      foregroundMovementSpeed: 1
+      backgroundSprite: {fileID: 21300000, guid: 5dcd6e99c5f37d14b82a43adb1122981, type: 3}
+      foregroundSprites:
+      - {fileID: 21300000, guid: 8456e7faa29c2ff47aa23fff6b42d306, type: 3}
+      - {fileID: 21300000, guid: 9e53e92058595eb4aab066afa4a1c097, type: 3}
+      - {fileID: 21300000, guid: 8d1e2a2079918f54d9fd12b685413fb5, type: 3}

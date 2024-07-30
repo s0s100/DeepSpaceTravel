@@ -5,6 +5,7 @@ namespace Config
     [Serializable]
     public struct ConfigData
     {
-        public ControlConfig control;
+        public PlayerControlConfig PlayerControlConfig;
+        public BackgroundConfig BackgroundConfig;
     }
 }

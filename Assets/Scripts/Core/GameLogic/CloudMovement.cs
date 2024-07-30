@@ -14,7 +14,6 @@ namespace Core
         void Start()
         {
             Destroy(gameObject, DeletionTime);
-
             _movementSubscription = Observable
                         .EveryUpdate()
                         .Subscribe(_ =>

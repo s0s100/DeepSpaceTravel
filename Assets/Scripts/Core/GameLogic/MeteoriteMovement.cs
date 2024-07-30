@@ -7,7 +7,7 @@ namespace Core
     public class MeteoriteMovement : MonoBehaviour
     {
         // Move to config later on
-        private readonly float _maxRotationSpeed = 10.0f;
+        //private readonly float _maxRotationSpeed = 10.0f;
         private readonly float _xMoveLimit = 1.0f;
         private readonly float _yMoveLimit = 3.0f;
         private readonly float _deletionTime = 10.0f;

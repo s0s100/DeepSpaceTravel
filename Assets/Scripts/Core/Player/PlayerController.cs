@@ -63,7 +63,7 @@ namespace Core.Player
         {
             _movementSubscription?.Dispose();
 
-            var movementType = _config.control.movementType;
+            var movementType = _config.PlayerControlConfig.movementType;
             var moveAction = _actionDictionary[movementType];
             _movementSubscription = Observable
                     .EveryUpdate()
@@ -129,7 +129,7 @@ namespace Core.Player
 
         private Vector2 CalculateDirection(Vector2 comparePosition)
         {
-            var minTouchDistance = _config.control.minTouchDistance;
+            var minTouchDistance = _config.PlayerControlConfig.minTouchDistance;
             var direction = Vector2.zero;
 
             if (_moveTouchPos.x > comparePosition.x + minTouchDistance)
@@ -147,9 +147,9 @@ namespace Core.Player
 
         private void MovementSetup()
         {
-            var f = _config.control.fCoefficient;
-            var c = _config.control.cCoefficient;
-            var r = _config.control.rCoefficient;
+            var f = _config.PlayerControlConfig.fCoefficient;
+            var c = _config.PlayerControlConfig.cCoefficient;
+            var r = _config.PlayerControlConfig.rCoefficient;
 
             // Caclulate default constunts
             k1 = c / (float)(Math.PI * f);
