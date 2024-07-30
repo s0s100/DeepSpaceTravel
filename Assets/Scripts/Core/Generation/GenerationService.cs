@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace Core
 {
-    public class GenerationManager : MonoBehaviour
+    public class GenerationService : MonoBehaviour
     {
         [SerializeField]
         private GenerationPattern[] generationPatterns;
