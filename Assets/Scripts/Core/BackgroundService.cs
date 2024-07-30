@@ -4,7 +4,7 @@ using System;
 
 namespace Core
 {
-    public class BackgroundManager : MonoBehaviour
+    public class BackgroundService : MonoBehaviour
     {
         private const float CloudSizeResize = 5.0f;
         private const float DefaultGenerationShift = 2.0f;

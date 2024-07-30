@@ -1,6 +1,7 @@
 using Config;
 using UnityEngine;
 using Zenject;
+using Core;
 
 namespace Installers
 {
@@ -11,6 +12,8 @@ namespace Installers
         public override void InstallBindings()
         {
             Container.BindInstance(config.Data).AsSingle();
+            Container.Bind<BackgroundService>().AsSingle();
+            Container.Bind<GenerationService>().AsSingle();
         }
     }
 }
