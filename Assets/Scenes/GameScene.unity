@@ -180,8 +180,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f8dc425fe6f7cff48af28fac50854e86, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  generationPatterns:
-  - {fileID: 11400000, guid: 5762f8ddce212c64d8abeb13bdcbc0f1, type: 2}
 --- !u!1 &800541025
 GameObject:
   m_ObjectHideFlags: 0
@@ -920,8 +918,8 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1704707896}
-  - {fileID: 1641785464}
   - {fileID: 206292244}
+  - {fileID: 1641785464}
   - {fileID: 1645278001}
   - {fileID: 800541027}
   - {fileID: 834686708}
